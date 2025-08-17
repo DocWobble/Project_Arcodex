@@ -18,3 +18,14 @@
 
 *(New entries go on top. Keep each under ~20 lines.)*
 
+### [2025-08-17] missing-sandbox-error
+- **Context:** `codex-cli` panicked when the `codex-linux-sandbox` binary was missing.
+- **Decision:** Return a descriptive error instead of panicking so users understand the failure.
+- **Alternatives:** Keep using `.expect` and crash.
+- **Trade-offs:** Slightly more code; reliance on error handling.
+- **Scope:** `codex-rs/cli` sandbox command path.
+- **Impact:** CLI fails gracefully when Landlock sandbox is requested without the binary.
+- **TTL / Review:** Revisit if sandbox architecture changes.
+- **Status:** ACTIVE
+- **Links:** See PR for missing sandbox executable handling.
+

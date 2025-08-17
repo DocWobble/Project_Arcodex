@@ -667,6 +667,7 @@ dependencies = [
  "codex-mcp-server",
  "codex-tui",
  "serde_json",
+ "tempfile",
  "tokio",
  "tracing",
  "tracing-subscriber",

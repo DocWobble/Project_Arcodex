@@ -84,10 +84,9 @@ async fn run_command_under_sandbox(
                 .await?
         }
         SandboxType::Landlock => {
-            #[expect(clippy::expect_used)]
-            let codex_linux_sandbox_exe = config
-                .codex_linux_sandbox_exe
-                .expect("codex-linux-sandbox executable not found");
+            let Some(codex_linux_sandbox_exe) = config.codex_linux_sandbox_exe else {
+                anyhow::bail!("codex-linux-sandbox executable not found");
+            };
             spawn_command_under_linux_sandbox(
                 codex_linux_sandbox_exe,
                 command,
@@ -109,5 +108,35 @@ pub fn create_sandbox_mode(full_auto: bool) -> SandboxMode {
         SandboxMode::WorkspaceWrite
     } else {
         SandboxMode::ReadOnly
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[tokio::test]
+    async fn missing_linux_sandbox_binary_returns_error() {
+        let tmp = tempdir().expect("tempdir");
+        unsafe {
+            std::env::set_var("CODEX_HOME", tmp.path());
+        }
+
+        let err = run_command_under_sandbox(
+            false,
+            vec!["true".into()],
+            CliConfigOverrides::default(),
+            None,
+            SandboxType::Landlock,
+        )
+        .await
+        .expect_err("should fail when codex-linux-sandbox is missing");
+
+        assert!(
+            err.to_string()
+                .contains("codex-linux-sandbox executable not found"),
+            "unexpected error: {err}"
+        );
     }
 }

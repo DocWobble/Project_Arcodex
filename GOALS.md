@@ -37,3 +37,14 @@
 
 *(Append new capabilities below using the format above. Keep the list curated; collapse removed items to a brief tombstone if noisy.)*
 
+### Capability: graceful-missing-sandbox
+- **Purpose:** Ensure the CLI reports a clear error when the `codex-linux-sandbox` binary is absent.
+- **Scope:** `codex-rs/cli` Landlock sandbox execution path.
+- **Shape:** Attempting Landlock without the binary yields a descriptive failure instead of a panic.
+- **Compatibility:** No flags or migrations; failure surfaces as an error.
+- **Status:** active
+- **Owner:** repo owner
+- **Linked Scenes:** `codex-rs/cli/src/debug_sandbox.rs::missing_linux_sandbox_binary_returns_error`
+- **Linked Decisions:** [2025-08-17] missing-sandbox-error
+- **Notes:** n/a
+
