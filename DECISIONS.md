@@ -29,3 +29,14 @@
 - **Status:** ACTIVE
 - **Links:** See PR for missing sandbox executable handling.
 
+### [2025-08-19] login-result-handling
+- **Context:** Login helpers exited the process directly, making reuse and testing difficult.
+- **Decision:** Return `Result`/status enums from login helpers and manage exits in `main.rs`.
+- **Alternatives:** Keep process termination inside helper functions.
+- **Trade-offs:** More boilerplate in the caller; functions now expose additional types.
+- **Scope:** `codex-rs/cli` login module and main entrypoint.
+- **Impact:** Enables programmatic control over login flows and clearer testing.
+- **TTL / Review:** Revisit when authentication flow changes.
+- **Status:** ACTIVE
+- **Links:** goal result-based-login
+

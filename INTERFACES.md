@@ -29,3 +29,24 @@
 - **Code:** `<path/to/implementation>`
 - **Change Log:** <brief bullet list of meaningful changes with commit/PR ids>
 
+### Surface: cli-login-helpers
+- **Type:** Library
+- **Purpose:** Programmatic login/logout operations for Codex.
+- **Shape:**
+  - **Request/Input:**
+    - `run_login_with_chatgpt(overrides) -> Result<()>`
+    - `run_login_with_api_key(overrides, api_key) -> Result<()>`
+    - `run_login_status(overrides) -> Result<LoginStatus>`
+    - `run_logout(overrides) -> Result<LogoutStatus>`
+  - **Response/Output:** status enums or `()`; errors via `anyhow::Error`.
+- **Idempotency/Retry:** login/logout mutate credentials; status is read-only.
+- **Stability:** experimental
+- **Versioning:** semver via `codex-cli`
+- **Auth/Access:** filesystem access to `CODEX_HOME`
+- **Observability:** messages printed to stderr
+- **Failure Modes:** config parse errors, filesystem I/O failures
+- **Owner:** repo owner
+- **Code:** `codex-rs/cli/src/login.rs`
+- **Change Log:**
+  - 2025-08-19: return `Result` from helpers (#PR)
+

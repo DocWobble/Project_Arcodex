@@ -48,3 +48,14 @@
 - **Linked Decisions:** [2025-08-17] missing-sandbox-error
 - **Notes:** n/a
 
+### Capability: result-based-login
+- **Purpose:** Allow CLI login helpers to return structured results for better control and testing.
+- **Scope:** `codex-rs/cli` login module and main entrypoint.
+- **Shape:** login operations yield `Result`/status enums; caller decides process exit.
+- **Compatibility:** no flags; CLI output unchanged.
+- **Status:** active
+- **Owner:** repo owner
+- **Linked Scenes:** `codex-rs/cli/src/login.rs` tests
+- **Linked Decisions:** [2025-08-19] login-result-handling
+- **Notes:** n/a
+
