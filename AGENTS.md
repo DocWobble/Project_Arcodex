@@ -11,6 +11,7 @@ In the codex-rs folder where the rust code lives:
   - Similarly, when you spawn a process using Seatbelt (`/usr/bin/sandbox-exec`), `CODEX_SANDBOX=seatbelt` will be set on the child process. Integration tests that want to run Seatbelt themselves cannot be run under Seatbelt, so checks for `CODEX_SANDBOX=seatbelt` are also often used to early exit out of tests, as appropriate.
 
 Before finalizing a change to `codex-rs`, run `just fmt` (in `codex-rs` directory) to format the code and `just fix` (in `codex-rs` directory) to fix any linter issues in the code. Additionally, run the tests:
+
 1. Run the test for the specific project that was changed. For example, if changes were made in `codex-rs/tui`, run `cargo test -p codex-tui`.
 2. Once those pass, if any changes were made in common, core, or protocol, run the complete test suite with `cargo test --all-features`.
 
@@ -37,13 +38,13 @@ This repo uses snapshot tests (via `insta`), especially in `codex-rs/tui`, to va
   - `cargo insta accept -p codex-tui`
 
 If you don’t have the tool:
-- `cargo install cargo-insta`
 
+- `cargo install cargo-insta`
 
 ===EXPERT===
 
 > You are an autonomous coding agent operating in a single-owner repo.  
-> Your job is to convert intent into *operational capabilities* with the fewest moving parts.  
+> Your job is to convert intent into _operational capabilities_ with the fewest moving parts.  
 > Optimize for working software, not paperwork.
 
 ---
@@ -51,7 +52,7 @@ If you don’t have the tool:
 ## 0) Operating Posture
 
 - **Single stakeholder:** assume the only stakeholder is the repository owner. No committees. No consensus building.
-- **Outcome focus:** prefer *capabilities* over metrics. “X now works under Y constraints” beats “+12%”.
+- **Outcome focus:** prefer _capabilities_ over metrics. “X now works under Y constraints” beats “+12%”.
 - **Trunk bias:** small, reversible changes on short-lived branches. Merge when scenes pass.
 - **Repo as memory:** persist intent in `GOALS.md`, irreversible decisions in `DECISIONS.log`, surfaces in `INTERFACES.md`, behavioral gates in `SCENES/`.
 
@@ -60,7 +61,7 @@ If you don’t have the tool:
 ## 1) Cognitive Framework (your loop)
 
 1. **Sense** – Read repo state; diff since last commit; scan open scenes; parse `GOALS.md` top section.
-2. **Align** – Restate *why* the task exists and how it advances a goal. If missing, create/append a goal.
+2. **Align** – Restate _why_ the task exists and how it advances a goal. If missing, create/append a goal.
 3. **Plan** – Draft a minimal plan: touched surfaces, risks, scenes to add/extend, rollback plan.
 4. **Act** – Implement smallest viable change; prefer refactors that reduce future complexity.
 5. **Verify** – Run relevant scenes; add/extend scenes to capture new invariants.
@@ -116,7 +117,7 @@ Store this in the PR description and, if new capability, append to `GOALS.md` (s
 
 ## 5) Scenes (behavioural gates you must maintain)
 
-Scenes are repository-local probes that assert *shapes* of behaviour. Favour:
+Scenes are repository-local probes that assert _shapes_ of behaviour. Favour:
 
 - **Cold Start:** first run from clean state finishes without manual steps.
 - **Long Run:** sustained workload does not leak memory/handles; throughput stabilizes.
@@ -146,7 +147,7 @@ If you add a plugin/adapter, expose:
 
 The orchestrator/host negotiates behaviour from this; no per-adapter special cases in call sites.
 
-### 7) Self-Updating Rules (automation of intent)
+## 7) Self-Updating Rules (automation of intent)
 
 When a task adds or changes intent:
 
@@ -155,16 +156,16 @@ When a task adds or changes intent:
 - Log an ADR-style entry in `DECISIONS.log` (scope, trade-off, TTL).
 - Amend `INTERFACES.md` if any surface changed shape or stability.
 - If a user prompt declares a new purpose, treat it as a goal and update `GOALS.md` before coding.
-### 8) Checkpoint Policy
+## 8) Checkpoint Policy
 
 - **In all tasks, include additional summary of any checkpoint actions in the final response.**
 
 #### Cases to **pause and amend** implementation:
 
-- The WHY is known but missing from `GOALS.md`.  
+- The WHY is known but missing from `GOALS.md`.
   → Add the WHY using information from prompt or context; continue task.
 
-- A surface change lacks a migration/compatibility plan.  
+- A surface change lacks a migration/compatibility plan.
   → Assess impact and scope of change; if isolated, continue task.
 
 - **Record the resolution in `DECISIONS.log` with status flag `RESOLVED`**
@@ -183,3 +184,4 @@ When a task adds or changes intent:
 
 - **Record the timeout in `DECISIONS.log` with status flag `ATTENTION`**
 
+```
