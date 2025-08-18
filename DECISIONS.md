@@ -6,6 +6,7 @@
 ## Entry Template
 
 ### [YYYY-MM-DD] <short handle>
+
 - **Context:** <why a choice was necessary; constraints at play>
 - **Decision:** <the chosen path in one or two sentences>
 - **Alternatives:** <bulleted, only those genuinely considered>
@@ -16,9 +17,22 @@
 - **Status:** ACTIVE | REPLACED | REJECTED | BLOCKED
 - **Links:** <PRs, scenes, interface entries, goal names>
 
-*(New entries go on top. Keep each under ~20 lines.)*
+_(New entries go on top. Keep each under ~20 lines.)_
+
+### [2025-08-29] cli-path-dedup
+
+- **Context:** Repeated CLI launches added duplicate directories to `PATH` causing unbounded growth.
+- **Decision:** Skip directories already present in `PATH` when computing the updated value.
+- **Alternatives:** Keep existing behavior and allow duplicates.
+- **Trade-offs:** Slight increase in startup logic complexity.
+- **Scope:** `codex-cli/bin/codex.js`.
+- **Impact:** CLI startup is idempotent with respect to environment `PATH`.
+- **TTL / Review:** Revisit if environment handling changes.
+- **Status:** ACTIVE
+- **Links:** goal cli-path-deduplication; `codex-cli/test/path.test.js`
 
 ### [2025-08-17] missing-sandbox-error
+
 - **Context:** `codex-cli` panicked when the `codex-linux-sandbox` binary was missing.
 - **Decision:** Return a descriptive error instead of panicking so users understand the failure.
 - **Alternatives:** Keep using `.expect` and crash.
@@ -30,6 +44,7 @@
 - **Links:** See PR for missing sandbox executable handling.
 
 ### [2025-08-19] login-result-handling
+
 - **Context:** Login helpers exited the process directly, making reuse and testing difficult.
 - **Decision:** Return `Result`/status enums from login helpers and manage exits in `main.rs`.
 - **Alternatives:** Keep process termination inside helper functions.
@@ -39,4 +54,3 @@
 - **TTL / Review:** Revisit when authentication flow changes.
 - **Status:** ACTIVE
 - **Links:** goal result-based-login
-
