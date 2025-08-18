@@ -7,9 +7,11 @@ use codex_chatgpt::apply_command::ApplyCommand;
 use codex_chatgpt::apply_command::run_apply_command;
 use codex_cli::LandlockCommand;
 use codex_cli::SeatbeltCommand;
-use codex_cli::login::{
-    LoginStatus, run_login_status, run_login_with_api_key, run_login_with_chatgpt, run_logout,
-};
+use codex_cli::login::LoginStatus;
+use codex_cli::login::run_login_status;
+use codex_cli::login::run_login_with_api_key;
+use codex_cli::login::run_login_with_chatgpt;
+use codex_cli::login::run_logout;
 use codex_cli::proto;
 use codex_common::CliConfigOverrides;
 use codex_exec::Cli as ExecCli;
@@ -228,4 +230,26 @@ fn print_completion(cmd: CompletionCommand) {
     let mut app = MultitoolCli::command();
     let name = "codex";
     generate(cmd.shell, &mut app, name, &mut std::io::stdout());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn root_flags_are_prepended() {
+        let mut sub = CliConfigOverrides {
+            raw_overrides: vec!["a=1".into()],
+        };
+        let root = CliConfigOverrides {
+            raw_overrides: vec!["a=2".into()],
+        };
+
+        prepend_config_flags(&mut sub, root);
+
+        assert_eq!(
+            sub.raw_overrides,
+            vec![String::from("a=2"), String::from("a=1")]
+        );
+    }
 }
