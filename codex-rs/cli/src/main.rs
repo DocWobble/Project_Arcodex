@@ -7,10 +7,9 @@ use codex_chatgpt::apply_command::ApplyCommand;
 use codex_chatgpt::apply_command::run_apply_command;
 use codex_cli::LandlockCommand;
 use codex_cli::SeatbeltCommand;
-use codex_cli::login::run_login_status;
-use codex_cli::login::run_login_with_api_key;
-use codex_cli::login::run_login_with_chatgpt;
-use codex_cli::login::run_logout;
+use codex_cli::login::{
+    LoginStatus, run_login_status, run_login_with_api_key, run_login_with_chatgpt, run_logout,
+};
 use codex_cli::proto;
 use codex_common::CliConfigOverrides;
 use codex_exec::Cli as ExecCli;
@@ -148,22 +147,37 @@ async fn cli_main(codex_linux_sandbox_exe: Option<PathBuf>) -> anyhow::Result<()
         }
         Some(Subcommand::Login(mut login_cli)) => {
             prepend_config_flags(&mut login_cli.config_overrides, cli.config_overrides);
-            match login_cli.action {
+            let exit_code = match login_cli.action {
                 Some(LoginSubcommand::Status) => {
-                    run_login_status(login_cli.config_overrides).await;
+                    match run_login_status(login_cli.config_overrides).await {
+                        Ok(LoginStatus::LoggedIn) => 0,
+                        Ok(LoginStatus::NotLoggedIn) => 1,
+                        Err(_) => 1,
+                    }
                 }
                 None => {
                     if let Some(api_key) = login_cli.api_key {
-                        run_login_with_api_key(login_cli.config_overrides, api_key).await;
+                        match run_login_with_api_key(login_cli.config_overrides, api_key).await {
+                            Ok(_) => 0,
+                            Err(_) => 1,
+                        }
                     } else {
-                        run_login_with_chatgpt(login_cli.config_overrides).await;
+                        match run_login_with_chatgpt(login_cli.config_overrides).await {
+                            Ok(_) => 0,
+                            Err(_) => 1,
+                        }
                     }
                 }
-            }
+            };
+            std::process::exit(exit_code);
         }
         Some(Subcommand::Logout(mut logout_cli)) => {
             prepend_config_flags(&mut logout_cli.config_overrides, cli.config_overrides);
-            run_logout(logout_cli.config_overrides).await;
+            let exit_code = match run_logout(logout_cli.config_overrides).await {
+                Ok(_) => 0,
+                Err(_) => 1,
+            };
+            std::process::exit(exit_code);
         }
         Some(Subcommand::Proto(mut proto_cli)) => {
             prepend_config_flags(&mut proto_cli.config_overrides, cli.config_overrides);
