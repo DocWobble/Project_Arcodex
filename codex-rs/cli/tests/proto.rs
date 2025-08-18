@@ -7,6 +7,6 @@ fn proto_help_runs() {
         .unwrap()
         .args(["proto", "--help"])
         .assert()
-        .success()
+        .code(0)
         .stdout(contains("Protocol"));
 }

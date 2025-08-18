@@ -11,6 +11,6 @@ fn login_status_not_logged_in() {
         .arg("login")
         .arg("status")
         .assert()
-        .failure()
+        .code(1)
         .stderr(contains("Not logged in"));
 }

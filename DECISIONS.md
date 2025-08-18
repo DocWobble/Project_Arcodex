@@ -18,6 +18,18 @@
 - **Links:** <PRs, scenes, interface entries, goal names>
 
 _(New entries go on top. Keep each under ~20 lines.)_
+### [2025-08-30] cli-exitcode-refactor
+
+- **Context:** Subcommands invoked std::process::exit directly, complicating error handling and testing.
+- **Decision:** Return ExitCode from `cli_main` and exit once in `main`.
+- **Alternatives:** Keep multiple exit points within subcommands.
+- **Trade-offs:** Requires threading exit codes through call sites.
+- **Scope:** `codex-rs/cli`, `codex-rs/arg0`.
+- **Impact:** Centralizes process termination and enables integration tests to assert exact exit codes.
+- **TTL / Review:** Revisit if CLI architecture changes.
+- **Status:** ACTIVE
+- **Links:** goal cli-exit-code-centralization
+
 
 ### [2025-08-29] cli-path-dedup
 
