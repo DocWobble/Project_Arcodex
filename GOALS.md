@@ -14,6 +14,7 @@
 ## Capability Entry Format (copy/paste)
 
 ### Capability: <short name>
+
 - **Purpose:** <why this exists in the product; 1–2 lines>
 - **Scope:** <surfaces affected (modules/apis/clis/data)>
 - **Shape:** <behavioural invariants asserted by scenes; no numbers>
@@ -35,9 +36,10 @@
 
 ## Current Capabilities
 
-*(Append new capabilities below using the format above. Keep the list curated; collapse removed items to a brief tombstone if noisy.)*
+_(Append new capabilities below using the format above. Keep the list curated; collapse removed items to a brief tombstone if noisy.)_
 
 ### Capability: graceful-missing-sandbox
+
 - **Purpose:** Ensure the CLI reports a clear error when the `codex-linux-sandbox` binary is absent.
 - **Scope:** `codex-rs/cli` Landlock sandbox execution path.
 - **Shape:** Attempting Landlock without the binary yields a descriptive failure instead of a panic.
@@ -49,6 +51,7 @@
 - **Notes:** n/a
 
 ### Capability: result-based-login
+
 - **Purpose:** Allow CLI login helpers to return structured results for better control and testing.
 - **Scope:** `codex-rs/cli` login module and main entrypoint.
 - **Shape:** login operations yield `Result`/status enums; caller decides process exit.
@@ -59,3 +62,14 @@
 - **Linked Decisions:** [2025-08-19] login-result-handling
 - **Notes:** n/a
 
+### Capability: cli-path-deduplication
+
+- **Purpose:** Prevent the Codex CLI from duplicating directories when updating `PATH`.
+- **Scope:** `codex-cli` startup environment handling.
+- **Shape:** Repeated CLI invocations do not accumulate duplicate `PATH` segments.
+- **Compatibility:** no flags; existing environment variables remain unchanged.
+- **Status:** active
+- **Owner:** repo owner
+- **Linked Scenes:** `codex-cli/test/path.test.js`
+- **Linked Decisions:** [2025-08-29] cli-path-dedup
+- **Notes:** n/a
