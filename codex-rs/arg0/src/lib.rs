@@ -26,10 +26,10 @@ use codex_core::CODEX_APPLY_PATCH_ARG1;
 ///
 /// This function should be used to wrap any `main()` function in binary crates
 /// in this workspace that depends on these helper CLIs.
-pub fn arg0_dispatch_or_else<F, Fut>(main_fn: F) -> anyhow::Result<()>
+pub fn arg0_dispatch_or_else<F, Fut, T>(main_fn: F) -> anyhow::Result<T>
 where
     F: FnOnce(Option<PathBuf>) -> Fut,
-    Fut: Future<Output = anyhow::Result<()>>,
+    Fut: Future<Output = anyhow::Result<T>>,
 {
     // Determine if we were invoked via the special alias.
     let mut args = std::env::args_os();

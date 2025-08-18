@@ -17,6 +17,7 @@ use codex_common::CliConfigOverrides;
 use codex_exec::Cli as ExecCli;
 use codex_tui::Cli as TuiCli;
 use std::path::PathBuf;
+use std::process::ExitCode;
 
 use crate::proto::ProtoCli;
 
@@ -121,17 +122,23 @@ struct LogoutCommand {
     config_overrides: CliConfigOverrides,
 }
 
-fn main() -> anyhow::Result<()> {
-    arg0_dispatch_or_else(|codex_linux_sandbox_exe| async move {
-        cli_main(codex_linux_sandbox_exe).await?;
-        Ok(())
-    })
+fn main() {
+    let exit_code = match arg0_dispatch_or_else(|codex_linux_sandbox_exe| async move {
+        cli_main(codex_linux_sandbox_exe).await
+    }) {
+        Ok(code) => code,
+        Err(e) => {
+            eprintln!("{e:?}");
+            ExitCode::from(1)
+        }
+    };
+    std::process::exit(exit_code.code());
 }
 
-async fn cli_main(codex_linux_sandbox_exe: Option<PathBuf>) -> anyhow::Result<()> {
+async fn cli_main(codex_linux_sandbox_exe: Option<PathBuf>) -> anyhow::Result<ExitCode> {
     let cli = MultitoolCli::parse();
 
-    match cli.subcommand {
+    let code = match cli.subcommand {
         None => {
             let mut tui_cli = cli.interactive;
             prepend_config_flags(&mut tui_cli.config_overrides, cli.config_overrides);
@@ -139,17 +146,20 @@ async fn cli_main(codex_linux_sandbox_exe: Option<PathBuf>) -> anyhow::Result<()
             if !usage.is_zero() {
                 println!("{}", codex_core::protocol::FinalOutput::from(usage));
             }
+            ExitCode::SUCCESS
         }
         Some(Subcommand::Exec(mut exec_cli)) => {
             prepend_config_flags(&mut exec_cli.config_overrides, cli.config_overrides);
             codex_exec::run_main(exec_cli, codex_linux_sandbox_exe).await?;
+            ExitCode::SUCCESS
         }
         Some(Subcommand::Mcp) => {
             codex_mcp_server::run_main(codex_linux_sandbox_exe).await?;
+            ExitCode::SUCCESS
         }
         Some(Subcommand::Login(mut login_cli)) => {
             prepend_config_flags(&mut login_cli.config_overrides, cli.config_overrides);
-            let exit_code = match login_cli.action {
+            let code = match login_cli.action {
                 Some(LoginSubcommand::Status) => {
                     match run_login_status(login_cli.config_overrides).await {
                         Ok(LoginStatus::LoggedIn) => 0,
@@ -171,48 +181,54 @@ async fn cli_main(codex_linux_sandbox_exe: Option<PathBuf>) -> anyhow::Result<()
                     }
                 }
             };
-            std::process::exit(exit_code);
+            ExitCode::from(code)
         }
         Some(Subcommand::Logout(mut logout_cli)) => {
             prepend_config_flags(&mut logout_cli.config_overrides, cli.config_overrides);
-            let exit_code = match run_logout(logout_cli.config_overrides).await {
+            let code = match run_logout(logout_cli.config_overrides).await {
                 Ok(_) => 0,
                 Err(_) => 1,
             };
-            std::process::exit(exit_code);
+            ExitCode::from(code)
         }
         Some(Subcommand::Proto(mut proto_cli)) => {
             prepend_config_flags(&mut proto_cli.config_overrides, cli.config_overrides);
             proto::run_main(proto_cli).await?;
+            ExitCode::SUCCESS
         }
         Some(Subcommand::Completion(completion_cli)) => {
             print_completion(completion_cli);
+            ExitCode::SUCCESS
         }
-        Some(Subcommand::Debug(debug_args)) => match debug_args.cmd {
-            DebugCommand::Seatbelt(mut seatbelt_cli) => {
-                prepend_config_flags(&mut seatbelt_cli.config_overrides, cli.config_overrides);
-                codex_cli::debug_sandbox::run_command_under_seatbelt(
-                    seatbelt_cli,
-                    codex_linux_sandbox_exe,
-                )
-                .await?;
+        Some(Subcommand::Debug(debug_args)) => {
+            match debug_args.cmd {
+                DebugCommand::Seatbelt(mut seatbelt_cli) => {
+                    prepend_config_flags(&mut seatbelt_cli.config_overrides, cli.config_overrides);
+                    codex_cli::debug_sandbox::run_command_under_seatbelt(
+                        seatbelt_cli,
+                        codex_linux_sandbox_exe,
+                    )
+                    .await?;
+                }
+                DebugCommand::Landlock(mut landlock_cli) => {
+                    prepend_config_flags(&mut landlock_cli.config_overrides, cli.config_overrides);
+                    codex_cli::debug_sandbox::run_command_under_landlock(
+                        landlock_cli,
+                        codex_linux_sandbox_exe,
+                    )
+                    .await?;
+                }
             }
-            DebugCommand::Landlock(mut landlock_cli) => {
-                prepend_config_flags(&mut landlock_cli.config_overrides, cli.config_overrides);
-                codex_cli::debug_sandbox::run_command_under_landlock(
-                    landlock_cli,
-                    codex_linux_sandbox_exe,
-                )
-                .await?;
-            }
-        },
+            ExitCode::SUCCESS
+        }
         Some(Subcommand::Apply(mut apply_cli)) => {
             prepend_config_flags(&mut apply_cli.config_overrides, cli.config_overrides);
             run_apply_command(apply_cli, None).await?;
+            ExitCode::SUCCESS
         }
-    }
+    };
 
-    Ok(())
+    Ok(code)
 }
 
 /// Prepend root-level overrides so they have lower precedence than

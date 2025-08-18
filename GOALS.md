@@ -73,3 +73,14 @@ _(Append new capabilities below using the format above. Keep the list curated; c
 - **Linked Scenes:** `codex-cli/test/path.test.js`
 - **Linked Decisions:** [2025-08-29] cli-path-dedup
 - **Notes:** n/a
+### Capability: cli-exit-code-centralization
+
+- **Purpose:** enable consistent exit code handling across CLI subcommands.
+- **Scope:** `codex-rs/cli`, `codex-rs/arg0`.
+- **Shape:** each subcommand returns `ExitCode`; `main` terminates once with this code.
+- **Compatibility:** no flags; preserves existing behavior.
+- **Status:** active
+- **Owner:** repo owner
+- **Linked Scenes:** `codex-rs/cli/tests/login_status.rs`, `codex-rs/cli/tests/proto.rs`
+- **Linked Decisions:** [2025-08-30] cli-exitcode-refactor
+- **Notes:** facilitates test assertions on exit codes
